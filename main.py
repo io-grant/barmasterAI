@@ -3,10 +3,8 @@ import openai
 from dotenv import load_dotenv
 from colorama import Fore, Back, Style
 
-# load values from the .env file if it exists
 load_dotenv()
 
-# configure OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 INSTRUCTIONS = """You are an AI assistant that is an expert in alcoholic beverages.\nYou know about cocktails, wines, spirits, and beers.\nYouc an provide advice on drink menus, cocktail ingredients, how to make cocktails, and anything else related to alcoholic drinks.\nIf you are unable to provide an answer to a question, please respond with the phrase \"I'm just a simple barman, I can't help wit that.\"\nDo not use any external URLs in your answers. Do not refer to any blogs in your answers.\nFormat any lists on individual lines with a dash and a space in front of each item."""
@@ -15,7 +13,7 @@ TEMPERATURE = 0.5
 MAX_TOKENS = 500
 FREQUENCY_PENALTY = 0
 PRESENCE_PENALTY = 0.6
-# limits how many questions we include in the prompt
+
 MAX_CONTEXT_QUESTIONS = 10
 
 
@@ -74,7 +72,6 @@ def get_moderation(question):
     }
     response = openai.Moderation.create(input=question)
     if response.results[0].flagged:
-        # get the categories that are flagged and generate a message
         result = [
             error
             for category, error in errors.items()
@@ -86,14 +83,11 @@ def get_moderation(question):
 
 def main():
     os.system("cls" if os.name == "nt" else "clear")
-    # keep track of previous questions and answers
     previous_questions_and_answers = []
     while True:
-        # ask the user for their question
         new_question = input(
             Fore.GREEN + Style.BRIGHT + "What can I get you?: " + Style.RESET_ALL
         )
-        # check the question is safe
         errors = get_moderation(new_question)
         if errors:
             print(
@@ -107,10 +101,8 @@ def main():
             continue
         response = get_response(INSTRUCTIONS, previous_questions_and_answers, new_question)
 
-        # add the new question and answer to the list of previous questions and answers
         previous_questions_and_answers.append((new_question, response))
 
-        # print the response
         print(Fore.CYAN + Style.BRIGHT + "Here you go: " + Style.NORMAL + response)
 
 
